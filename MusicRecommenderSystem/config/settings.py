@@ -4,15 +4,15 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-class config:
+class Config:
     #Spotify info (fix this once spotify allows me to actually creaste an API key)
-    # Spotify_Client_ID = os.getenv
-    # Spotify_CLient_Secret = os.getenv
-    # Spotify_Redirect_URL = 
+    #SPOTIFY_CLIENT_ID = os.getenv('SPOTIFY_CLIENT_ID')
+    #SPOTIFY_CLIENT_SECRET = os.getenv('SPOTIFY_CLIENT_SECRET')
+    #SPOTIFY_REDIRECT_URI = 
 
 
     #Youtbie info
-    Youtube_API_Key = os.getenv('AIzaSyDVYeG9xnqulNgapLNs8ikM3tQSYn2S9W0')
+    YOUTUBE_API_KEY = os.getenv('AIzaSyDVYeG9xnqulNgapLNs8ikM3tQSYn2S9W0')
 
     #Cashe settings
     CACHE_ENABLED = True

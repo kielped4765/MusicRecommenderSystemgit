@@ -3,16 +3,18 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>89a08c44-dee5-4601-85c0-a0f2a1cf035b</ProjectGuid>
-    <ProjectHome>.</ProjectHome>
+    <ProjectHome>
+    </ProjectHome>
     <StartupFile>MusicRecommenderSystem.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
-    <Name>MusicRecommenderSystem</Name>
+    <Name>musicrecommendersystem</Name>
     <RootNamespace>MusicRecommenderSystem</RootNamespace>
     <IsWindowsApplication>False</IsWindowsApplication>
     <InterpreterId>MSBuild|venv|$(MSBuildProjectFullPath)</InterpreterId>
+    <TestFramework>Pytest</TestFramework>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -24,9 +26,30 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="config\settings.py" />
+    <Compile Include="config\__init__.py" />
+    <Compile Include="data\cache.py" />
+    <Compile Include="data\models.py" />
+    <Compile Include="data\playlists.py" />
     <Compile Include="main.py" />
     <Compile Include="MusicRecommenderSystem.py" />
-    <Compile Include="scr\api\spotify_client.py" />
+    <Compile Include="src\api\spotify_client.py" />
+    <Compile Include="src\api\__init__.py" />
+    <Compile Include="src\features\audio_features.py" />
+    <Compile Include="src\features\theme_analyzer.py" />
+    <Compile Include="src\api\youtube_client.py" />
+    <Compile Include="src\features\__init__.py" />
+    <Compile Include="src\playlist\genorator.py" />
+    <Compile Include="src\playlist\__init__.py" />
+    <Compile Include="src\recommenders\collaborative.py" />
+    <Compile Include="src\recommenders\content_based.py" />
+    <Compile Include="src\recommenders\hybrid.py" />
+    <Compile Include="src\recommenders\__init__.py" />
+    <Compile Include="src\utils\cache_manager.py" />
+    <Compile Include="src\utils\data_processor.py" />
+    <Compile Include="src\utils\__init__.py" />
+    <Compile Include="src\__init__.py" />
+    <Compile Include="tests\test_recommenders.py" />
+    <Compile Include="__init__.py" />
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="Global|PythonCore|3.11" />
@@ -44,8 +67,15 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="config\" />
-    <Folder Include="scr\" />
-    <Folder Include="scr\api\" />
+    <Folder Include="data\" />
+    <Folder Include="README.md\" />
+    <Folder Include="src\utils\" />
+    <Folder Include="src\playlist\" />
+    <Folder Include="src\recommenders\" />
+    <Folder Include="tests\" />
+    <Folder Include="src\" />
+    <Folder Include="src\api\" />
+    <Folder Include="src\features\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include=".env" />
