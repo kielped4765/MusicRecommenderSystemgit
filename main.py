@@ -1,4 +1,4 @@
-﻿print(">>> main.py started <<<")
+print(">>> main.py started <<<")
 
 from src.api.spotify_client import SpotifyClient
 from src.api.youtube_client import YouTubeClient
@@ -9,11 +9,9 @@ import json
 def main():
     print("🎵 Advanced Music Recommender System\n")
 
-    # Initialize clients
     spotify = SpotifyClient(use_auth=True)
     youtube = YouTubeClient()
 
-    # Initialize recommender and playlist generator
     recommender = HybridRecommender(spotify)
     playlist_gen = PlaylistGenerator(spotify)
 
@@ -37,13 +35,11 @@ def main():
 
             if track:
                 print(f"\nFound: {track['name']} by {track['artists'][0]['name']}")
-
                 recs = recommender.recommend(
                     track['id'],
                     theme=theme if theme else None,
                     n_recommendations=10
                 )
-
                 print("\nRecommended tracks:")
                 for i, rec in enumerate(recs, 1):
                     print(f"{i}. {rec['track']['name']} - {rec['track']['artists'][0]['name']}")
@@ -66,17 +62,15 @@ def main():
 
             if track:
                 print(f"\nGenerating playlist from: {track['name']}...")
-
                 playlist = playlist_gen.generate_from_seed(
                     track['id'],
                     playlist_length=length,
                     theme=theme if theme else None,
                     variety=variety
                 )
-
                 print(f"\n📝 Generated playlist ({len(playlist)} tracks):")
-                for i, track in enumerate(playlist, 1):
-                    print(f"{i}. {track['name']} - {track['artists'][0]['name']}")
+                for i, t in enumerate(playlist, 1):
+                    print(f"{i}. {t['name']} - {t['artists'][0]['name']}")
 
                 save = input("\nSave to Spotify? (y/n): ")
                 if save.lower() == 'y':
@@ -99,8 +93,8 @@ def main():
             playlist = playlist_gen.generate_by_theme(theme, length)
 
             print(f"\n📝 Generated playlist ({len(playlist)} tracks):")
-            for i, track in enumerate(playlist, 1):
-                print(f"{i}. {track['name']} - {track['artists'][0]['name']}")
+            for i, t in enumerate(playlist, 1):
+                print(f"{i}. {t['name']} - {t['artists'][0]['name']}")
 
         elif choice == '4':
             genres = input("Enter genres (comma-separated, e.g., 'rock,indie'): ").split(',')
@@ -124,8 +118,8 @@ def main():
             )
 
             print(f"\n📝 Generated playlist ({len(playlist)} tracks):")
-            for i, track in enumerate(playlist, 1):
-                print(f"{i}. {track['name']} - {track['artists'][0]['name']}")
+            for i, t in enumerate(playlist, 1):
+                print(f"{i}. {t['name']} - {t['artists'][0]['name']}")
 
         elif choice == '5':
             song_name = input("Enter song name: ")
@@ -148,8 +142,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-                      
-
-
-
