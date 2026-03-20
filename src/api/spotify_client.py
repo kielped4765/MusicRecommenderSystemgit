@@ -5,23 +5,11 @@ import time
 
 
 class SpotifyClient:
-    def __init__(self, use_auth=True):
-        """
-        Initialize Spotify client
-        use_auth: True for user-specific features (playlists), False for general search
-        """
-        if use_auth:
-            self.sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
-                client_id=Config.SPOTIFY_CLIENT_ID,
-                client_secret=Config.SPOTIFY_CLIENT_SECRET,
-                redirect_uri=Config.SPOTIFY_REDIRECT_URI,
-                scope="user-library-read playlist-modify-public playlist-modify-private"
-            ))
-        else:
-            self.sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(
-                client_id=Config.SPOTIFY_CLIENT_ID,
-                client_secret=Config.SPOTIFY_CLIENT_SECRET
-            ))
+    def __init__(self, use_auth=False):
+        self.sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(
+            client_id=Config.SPOTIFY_CLIENT_ID,
+            client_secret=Config.SPOTIFY_CLIENT_SECRET
+        ))
 
     def get_track_by_name(self, track_name, artist_name=None):
         """Search for a track by name and optionally artist"""

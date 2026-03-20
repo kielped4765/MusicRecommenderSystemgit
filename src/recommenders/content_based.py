@@ -1,45 +1,40 @@
-import numpy as np
-from sklearn.metrics.pairwise import cosine_similarity
-from MusicRecommenderSystem.src.features.audio_features import AudioFeatureExtractor
-
 class ContentBasedRecommender:
     def __init__(self, spotify_client):
         self.spotify = spotify_client
-        self.feature_extractor = AudioFeatureExtractor()
 
     def recommend(self, seed_track_id, n_recommendations=20):
-        """
-        Recommend tracks similar to the seed track
-        """
+        # Get seed track info
+        track_info = self.spotify.sp.track(seed_track_id)
+        artist_name = track_info['artists'][0]['name']
+        track_name = track_info['name']
 
-        # Get seed track features
-        seed_features = self.spotify.get_track_features(seed_track_id)
-        seed_vector = self.feature_extractor.extract_features(seed_features)
-
-        # Get Spotify recommendations as candidates
-
-        spotify_recs = self.spotify.get_recommedations(
-            seed_tracks = [seed_track_id],
-            limit = 100 # Get more candidates to filter
-        )
-
-        # Calculate similarity for each candidate 
         candidates = []
-        for track in spotify_recs['tracks']:
-            track_features = self.spotify.get_track_features(track['id'])
-            track_vector = self.feature_extractor.extract_features(track_features)
+        seen = set([seed_track_id])
 
-            similarity = self.feature_extractor.calculate_weighted_similarity(
-                seed_vector, track_vector
-            )
+        # Search for more tracks by same artist
+        results = self.spotify.sp.search(
+            q=f"artist:{artist_name}", type='track', limit=10
+        )
+        for track in results['tracks']['items']:
+            if track['id'] not in seen:
+                seen.add(track['id'])
+                candidates.append({
+                    'track': track,
+                    'features': {},
+                    'similarity': 1.0
+                })
 
-            candidates.append( {
-                'track': track,
-                'features': track_features,
-                'similarity': similarity
-            })
+        # Search for tracks using track name
+        results2 = self.spotify.sp.search(
+            q=track_name, type='track', limit=10
+        )
+        for track in results2['tracks']['items']:
+            if track['id'] not in seen:
+                seen.add(track['id'])
+                candidates.append({
+                    'track': track,
+                    'features': {},
+                    'similarity': 0.7
+                })
 
-            # Sort by similarity and return top N
-            candidates.sort(key=lambda x:x['similarity'], reverse= True)
-
-            return candidates[:n_recommendations]
+        return candidates[:n_recommendations]
