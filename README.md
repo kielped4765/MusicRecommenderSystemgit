@@ -1,17 +1,23 @@
-🎵 Advanced Music Recommender System
-A Python-based music recommendation engine that combines content-based filtering, NLP theme analysis, and the Spotify & YouTube APIs to generate personalized playlists and song recommendations.
+# 🎵 Advanced Music Recommender System
 
-Features
+A Python-based music recommendation engine that combines **content-based filtering**, **NLP theme analysis**, and the **Spotify & YouTube APIs** to generate personalized playlists and song recommendations.
 
-Hybrid Recommendations — Blends audio feature similarity with NLP-driven theme scoring for more contextual results
-Content-Based Filtering — Uses Spotify's audio features (energy, danceability, valence, tempo, etc.) with weighted cosine similarity
-Theme-Aware Playlists — Analyzes track names and artists using a zero-shot NLP classifier to match moods like workout, romance, focus, road_trip, and more
-Playlist Generation — Build playlists from a seed track, a genre + mood combination, or a specific theme
-YouTube Integration — Find official music videos for any track
-Save to Spotify — Export generated playlists directly to your Spotify account
+---
 
+## Features
 
-Project Structure
+- **Hybrid Recommendations** — Blends audio feature similarity with NLP-driven theme scoring for more contextual results
+- **Content-Based Filtering** — Uses Spotify's audio features (energy, danceability, valence, tempo, etc.) with weighted cosine similarity
+- **Theme-Aware Playlists** — Analyzes track names and artists using a zero-shot NLP classifier to match moods like `workout`, `romance`, `focus`, `road_trip`, and more
+- **Playlist Generation** — Build playlists from a seed track, a genre + mood combination, or a specific theme
+- **YouTube Integration** — Find official music videos for any track
+- **Save to Spotify** — Export generated playlists directly to your Spotify account
+
+---
+
+## Project Structure
+
+```
 music-recommender/
 │
 ├── config/
@@ -48,42 +54,66 @@ music-recommender/
 ├── main.py
 ├── requirements.txt
 └── .env
+```
 
-Prerequisites
+---
 
-Python 3.9+
-A Spotify Developer account
-A Google Cloud account with YouTube Data API v3 enabled
+## Prerequisites
 
+- Python 3.9+
+- A [Spotify Developer](https://developer.spotify.com/dashboard) account
+- A [Google Cloud](https://console.cloud.google.com/) account with YouTube Data API v3 enabled
 
-Installation
-1. Clone the repository
-bashgit clone https://github.com/kielped4765/MusicRecommenderSystem.git
+---
+
+## Installation
+
+**1. Clone the repository**
+
+```bash
+git clone https://github.com/kielped4765/MusicRecommenderSystem.git
 cd MusicRecommenderSystem
-2. Install dependencies
-bashpip install -r requirements.txt
-3. Set up API credentials
-Create a .env file in the project root:
-envSPOTIFY_CLIENT_ID=your_client_id_here
+```
+
+**2. Install dependencies**
+
+```bash
+pip install -r requirements.txt
+```
+
+**3. Set up API credentials**
+
+Create a `.env` file in the project root:
+
+```env
+SPOTIFY_CLIENT_ID=your_client_id_here
 SPOTIFY_CLIENT_SECRET=your_client_secret_here
 YOUTUBE_API_KEY=your_youtube_api_key_here
-Spotify setup:
+```
 
-Go to the Spotify Developer Dashboard
-Create an app and copy your Client ID and Client Secret
-Set the redirect URI to http://localhost:8888/callback
+**Spotify setup:**
+1. Go to the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)
+2. Create an app and copy your Client ID and Client Secret
+3. Set the redirect URI to `http://localhost:8888/callback`
 
-YouTube setup:
+**YouTube setup:**
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Create a project and enable the **YouTube Data API v3**
+3. Create an API key under Credentials
 
-Go to Google Cloud Console
-Create a project and enable the YouTube Data API v3
-Create an API key under Credentials
+---
 
+## Usage
 
-Usage
 Run the interactive CLI:
-bashpython main.py
+
+```bash
+python main.py
+```
+
 You'll be presented with the following options:
+
+```
 🎵 Advanced Music Recommender System
 
 Choose an option:
@@ -93,35 +123,76 @@ Choose an option:
 4. Generate playlist by genre and mood
 5. Find YouTube music video
 6. Exit
-Examples
-Get recommendations for a song:
+```
+
+### Examples
+
+**Get recommendations for a song:**
+```
 Enter song name: Blinding Lights
 Enter artist name (optional): The Weeknd
 Enter theme (optional): workout
-Generate a theme-based playlist:
+```
+
+**Generate a theme-based playlist:**
+```
 Available themes: party, workout, relaxation, romance, melancholy, focus, road_trip, sleep
 Enter theme name: road_trip
 Playlist length: 25
-Generate a playlist by genre and mood:
+```
+
+**Generate a playlist by genre and mood:**
+```
 Enter genres: indie, alternative
 Energy (0-1): 0.7
 Valence/happiness (0-1): 0.6
 Danceability (0-1): 0.5
+```
 
-How It Works
-Audio Feature Similarity
+---
+
+## How It Works
+
+### Audio Feature Similarity
+
 Tracks are compared using Spotify's audio features with configurable weights:
-FeatureWeightDanceability1.0Energy1.0Valence0.8Acousticness0.7Tempo0.6Instrumentalness0.5Speechiness0.4
-Similarity is calculated using weighted cosine similarity between feature vectors.
-Hybrid Scoring
-When a theme is specified, the final score blends both signals:
-hybrid_score = (0.6 × audio_similarity) + (0.4 × theme_score)
-Theme scores are generated by a zero-shot NLP classifier (facebook/bart-large-mnli) run against track names and artist names.
-Mood Classification
-Tracks are automatically classified into four mood quadrants based on valence and energy:
-High EnergyLow EnergyHigh ValenceHappy & EnergeticHappy & CalmLow ValenceSad & EnergeticSad & Calm
 
-Dependencies
+| Feature | Weight |
+|---|---|
+| Danceability | 1.0 |
+| Energy | 1.0 |
+| Valence | 0.8 |
+| Acousticness | 0.7 |
+| Tempo | 0.6 |
+| Instrumentalness | 0.5 |
+| Speechiness | 0.4 |
+
+Similarity is calculated using **weighted cosine similarity** between feature vectors.
+
+### Hybrid Scoring
+
+When a theme is specified, the final score blends both signals:
+
+```
+hybrid_score = (0.6 × audio_similarity) + (0.4 × theme_score)
+```
+
+Theme scores are generated by a zero-shot NLP classifier (`facebook/bart-large-mnli`) run against track names and artist names.
+
+### Mood Classification
+
+Tracks are automatically classified into four mood quadrants based on valence and energy:
+
+| | High Energy | Low Energy |
+|---|---|---|
+| **High Valence** | Happy & Energetic | Happy & Calm |
+| **Low Valence** | Sad & Energetic | Sad & Calm |
+
+---
+
+## Dependencies
+
+```
 spotipy==2.23.0
 google-api-python-client==2.108.0
 pandas==2.1.3
@@ -135,14 +206,27 @@ transformers==4.35.2
 torch==2.1.1
 redis==5.0.1
 joblib==1.3.2
+```
 
-Roadmap
+---
 
- Redis caching for API responses
- Flask/FastAPI REST API
- React web dashboard
- Collaborative filtering with matrix factorization (SVD/ALS)
- Last.fm scrobble data integration
- Lyrics analysis via Genius API
- User feedback loop for improving recommendations
- A/B testing framework for algorithm comparison
+## Roadmap
+
+- [ ] Redis caching for API responses
+- [ ] Flask/FastAPI REST API
+- [ ] React web dashboard
+- [ ] Collaborative filtering with matrix factorization (SVD/ALS)
+- [ ] Last.fm scrobble data integration
+- [ ] Lyrics analysis via Genius API
+- [ ] User feedback loop for improving recommendations
+- [ ] A/B testing framework for algorithm comparison
+
+---
+
+## Testing
+
+```bash
+python -m pytest tests/
+```
+
+---
