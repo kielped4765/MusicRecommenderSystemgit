@@ -1,0 +1,12 @@
+# Never send credentials or local environment configuration to the Docker build.
+**/.env
+**/.env.*
+!**/.env.example
+
+# Exclude local tooling, caches, and source-control metadata.
+**/venv/
+**/.venv/
+**/__pycache__/
+**/.git/
+**/.vs/
+**/*.py[cod]
