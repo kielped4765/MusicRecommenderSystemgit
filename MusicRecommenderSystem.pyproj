@@ -5,7 +5,8 @@
     <ProjectGuid>89a08c44-dee5-4601-85c0-a0f2a1cf035b</ProjectGuid>
     <ProjectHome>
     </ProjectHome>
-    <StartupFile>MusicRecommenderSystem.py</StartupFile>
+    <StartupFile>
+    </StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -31,7 +32,6 @@
     <Compile Include="data\models.py" />
     <Compile Include="data\playlists.py" />
     <Compile Include="main.py" />
-    <Compile Include="MusicRecommenderSystem.py" />
     <Compile Include="src\api\spotify_client.py" />
     <Compile Include="src\api\__init__.py" />
     <Compile Include="src\features\audio_features.py" />
