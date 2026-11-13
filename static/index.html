@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Find music recommendations based on a Spotify track.">
+  <title>Music Recommender</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: #101411;
+      color: #f3f7f4;
+      font-synthesis: none;
+    }
+    body { margin: 0; }
+    main { width: min(860px, calc(100% - 32px)); margin: 48px auto; }
+    h1 { margin-bottom: 8px; }
+    .muted, #status { color: #b7c3bb; }
+    form, .card { background: #1b241e; border: 1px solid #2e3b32; border-radius: 12px; }
+    form { display: grid; grid-template-columns: 2fr 1.5fr auto; gap: 12px; padding: 18px; }
+    label { display: grid; gap: 6px; color: #c9d4cc; font-size: .9rem; }
+    input, button { font: inherit; border-radius: 8px; padding: 10px 12px; }
+    input { min-width: 0; color: #f3f7f4; background: #101411; border: 1px solid #536259; }
+    button { align-self: end; color: #08200f; background: #1ed760; border: 0; font-weight: 700; cursor: pointer; }
+    button:disabled { cursor: wait; opacity: .65; }
+    .secondary { color: #f3f7f4; background: #35443a; }
+    #status { min-height: 1.5em; margin: 14px 0; }
+    .card { display: flex; align-items: center; gap: 14px; padding: 14px; margin: 10px 0; }
+    .card img { width: 64px; height: 64px; object-fit: cover; border-radius: 6px; background: #29342c; }
+    .details { flex: 1; min-width: 0; }
+    .details p { margin: 4px 0 0; color: #b7c3bb; }
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    a { color: #1ed760; }
+    #videos { margin-top: 20px; }
+    @media (max-width: 640px) {
+      main { margin-top: 28px; }
+      form { grid-template-columns: 1fr; }
+      button { justify-self: start; }
+      .card { align-items: flex-start; }
+      .actions { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Music Recommender</h1>
+    <p class="muted">Search for a Spotify track, then discover similar songs.</p>
+
+    <form id="search-form">
+      <label>
+        Song
+        <input id="song" name="song" required maxlength="120" placeholder="Blinding Lights">
+      </label>
+      <label>
+        Artist (optional)
+        <input id="artist" name="artist" maxlength="120" placeholder="The Weeknd">
+      </label>
+      <button id="search-button" type="submit">Find track</button>
+    </form>
+
+    <p id="status" role="status" aria-live="polite"></p>
+    <section id="seed" aria-label="Selected track"></section>
+    <section id="recommendations" aria-label="Recommendations"></section>
+    <section id="videos" aria-label="YouTube results"></section>
+  </main>
+  <script>
+    const form = document.querySelector("#search-form");
+    const searchButton = document.querySelector("#search-button");
+    const status = document.querySelector("#status");
+    const seedContainer = document.querySelector("#seed");
+    const recommendationsContainer = document.querySelector("#recommendations");
+    const videosContainer = document.querySelector("#videos");
+
+    async function requestJson(path) {
+      const response = await fetch(path);
+      const payload = await response.json();
+      if (!response.ok) {
+        throw new Error(payload.detail || "The request could not be completed.");
+      }
+      return payload;
+    }
+
+    function makeTrackCard(track, showRecommendations = false) {
+      const card = document.createElement("article");
+      card.className = "card";
+
+      // Use textContent for API values so track names are treated as plain text.
+      const image = document.createElement("img");
+      image.alt = "";
+      if (track.image_url) image.src = track.image_url;
+      card.append(image);
+
+      const details = document.createElement("div");
+      details.className = "details";
+      const title = document.createElement("strong");
+      title.textContent = track.name;
+      const subtitle = document.createElement("p");
+      subtitle.textContent = [track.artists.join(", "), track.album].filter(Boolean).join(" · ");
+      details.append(title, subtitle);
+
+      const actions = document.createElement("div");
+      actions.className = "actions";
+      if (showRecommendations) {
+        const recommendButton = document.createElement("button");
+        recommendButton.type = "button";
+        recommendButton.textContent = "Similar songs";
+        recommendButton.addEventListener("click", () => loadRecommendations(track.id));
+        actions.append(recommendButton);
+      }
+      if (track.spotify_url) {
+        const spotifyLink = document.createElement("a");
+        spotifyLink.href = track.spotify_url;
+        spotifyLink.target = "_blank";
+        spotifyLink.rel = "noopener noreferrer";
+        spotifyLink.textContent = "Open in Spotify";
+        actions.append(spotifyLink);
+      }
+      const videoButton = document.createElement("button");
+      videoButton.type = "button";
+      videoButton.className = "secondary";
+      videoButton.textContent = "Find video";
+      videoButton.addEventListener("click", () => loadVideos(track.name, track.artists[0] || ""));
+      actions.append(videoButton);
+
+      card.append(details, actions);
+      return card;
+    }
+
+    async function loadRecommendations(trackId) {
+      status.textContent = "Finding similar songs…";
+      recommendationsContainer.replaceChildren();
+      videosContainer.replaceChildren();
+      try {
+        const query = new URLSearchParams({ seed_track_id: trackId, limit: "10" });
+        const data = await requestJson(`/api/recommendations?${query}`);
+        const heading = document.createElement("h2");
+        heading.textContent = "Recommended tracks";
+        recommendationsContainer.append(heading);
+        for (const track of data.recommendations) {
+          recommendationsContainer.append(makeTrackCard(track));
+        }
+        status.textContent = data.recommendations.length
+          ? `Found ${data.recommendations.length} recommendations.`
+          : "No recommendations were found for that track.";
+      } catch (error) {
+        status.textContent = error.message;
+      }
+    }
+
+    async function loadVideos(trackName, artistName) {
+      status.textContent = "Searching YouTube…";
+      videosContainer.replaceChildren();
+      try {
+        const query = new URLSearchParams({ track: trackName, artist: artistName });
+        const data = await requestJson(`/api/youtube?${query}`);
+        const heading = document.createElement("h2");
+        heading.textContent = "YouTube results";
+        videosContainer.append(heading);
+        for (const video of data.videos) {
+          const link = document.createElement("a");
+          link.href = `https://www.youtube.com/watch?v=${encodeURIComponent(video.video_id)}`;
+          link.target = "_blank";
+          link.rel = "noopener noreferrer";
+          link.textContent = `${video.title} — ${video.channel}`;
+          const card = document.createElement("article");
+          card.className = "card";
+          card.append(link);
+          videosContainer.append(card);
+        }
+        status.textContent = data.videos.length ? "YouTube results loaded." : "No videos were found.";
+      } catch (error) {
+        status.textContent = error.message;
+      }
+    }
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      status.textContent = "Searching Spotify…";
+      searchButton.disabled = true;
+      seedContainer.replaceChildren();
+      recommendationsContainer.replaceChildren();
+      videosContainer.replaceChildren();
+      const query = new URLSearchParams({
+        q: document.querySelector("#song").value.trim(),
+        artist: document.querySelector("#artist").value.trim()
+      });
+      try {
+        const data = await requestJson(`/api/search?${query}`);
+        seedContainer.append(makeTrackCard(data.track, true));
+        status.textContent = "Track found. Choose “Similar songs” to continue.";
+      } catch (error) {
+        status.textContent = error.message;
+      } finally {
+        searchButton.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
